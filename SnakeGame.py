@@ -4,6 +4,10 @@ import random
 
 delay = 0.1
 
+#Score
+score =0
+highScore=0
+
 #Setting up the screen
 window = turtle.Screen()
 window.title("Snake Game by Lexiang Pan and Ryan Shen")
@@ -31,15 +35,29 @@ apple.direction = "stop"
 
 segments = []
 
+#Pen
+pen = turtle.Turtle()
+pen.speed(0)
+pen.shape("square")
+pen.color("white")
+pen.penup()
+pen.hideturtle()
+pen.goto(0, 260)
+pen.write("Score: 0 High Score: 0", align="center", font=("Courier", 24, "normal"))
+
 #functions
 def going_up():
-    head.direction = "up"
+    if head.direction != "down":
+        head.direction = "up"
 def going_down():
-    head.direction = "down"
+    if head.direction != "up":
+        head.direction = "down"
 def going_left():
-    head.direction = "left"
+    if head.direction != "right":
+        head.direction = "left"
 def going_right():
-    head.direction = "right"
+    if head.direction != "left":
+        head.direction = "right"
 
 #Functions
 def snakeMoving():
@@ -56,6 +74,29 @@ def snakeMoving():
         x = head.xcor()
         head.setx(x + 20)
 
+#Function
+
+def restartGame(segments, delay):
+    time.sleep(1)
+    head.goto(0,0)
+    head.direction = "stop"
+
+    #hide segments
+    for s in segments:
+        s.goto(1000,1000)
+
+    #Clear segments list
+    segments = []
+
+    #reset score
+    score=0
+
+    #reset delay
+    delay =0.1
+
+    pen.clear()
+    pen.write("Score: {} High Score: {}".format(score, highScore), align="center", font=("Courier", 24, "normal"))
+
 #Keyboard Binding
 window.listen()
 window.onkeypress(going_up, "w")
@@ -66,7 +107,11 @@ window.onkeypress(going_right, "d")
 while True:
     window.update()
 
-    #check for collision 
+    #check for collision with border
+    if head.xcor()>290 or head.xcor()<-290 or head.ycor()>290 or head.ycor()<-290:
+        restartGame(segments, delay)
+
+    #check for collision with food
     if head.distance(apple) < 20:
         #move food to a new coordinate
         x = random.randint(-290,290)
@@ -80,7 +125,18 @@ while True:
         new_segment.color("blue")
         new_segment.penup()
         segments.append(new_segment)
+
+        #Shorten delay
+        delay -=0.001
+
+        #increase score
+        score +=10
     
+        if score >highScore:
+            highScore = score
+        pen.clear()
+        pen.write("Score: {} High Score: {}".format(score, highScore), align="center", font=("Courier", 24, "normal"))
+
     #moving the end segments first
     for index in range(len(segments)-1, 0, -1):
         x = segments[index-1].xcor()
@@ -93,7 +149,11 @@ while True:
         y = head.ycor()
         segments[0].goto(x, y)
     snakeMoving()
+
+    #check for head collision with body segments
+    for segment in segments:
+        if segment.distance(head) < 20:
+            restartGame(segments, delay)
     time.sleep(delay)
 
 window.mainloop()
-
