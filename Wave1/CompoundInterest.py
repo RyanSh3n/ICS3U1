@@ -1,0 +1,7 @@
+money = float(input("Print the amount of money depositied into the account"))
+year1 = round(money*1.04, 2)
+print("The amount of money in the account after the first year is",'%.2f' %year1)
+year2 = round(year1*1.04, 2)
+print("The amount of money in the account after the second year is",'%.2f' %year2)
+year3 = round(year2*1.04, 2)
+print("The amount of money in the account after the third year is",'%.2f' % year3)
